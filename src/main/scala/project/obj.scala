@@ -1,12 +1,20 @@
 package project
 
+import scala.io.Source
+
 import org.apache.spark.SparkConf
 import org.apache.spark.SparkContext
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.Row
-import org.apache.spark.sql._
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.types._
-import scala.io._
+import org.apache.spark.sql.SparkSession
+import org.apache.spark.sql.functions.broadcast
+import org.apache.spark.sql.functions.col
+import org.apache.spark.sql.functions.current_date
+import org.apache.spark.sql.functions.explode
+import org.apache.spark.sql.functions.regexp_replace
+import org.apache.spark.sql.types.LongType
+import org.apache.spark.sql.types.StructField
+import org.apache.spark.sql.types.StructType
 
 object obj {
 
@@ -29,19 +37,10 @@ object obj {
     val sc = new SparkContext(conf)
     sc.setLogLevel("ERROR")
     val spark = SparkSession.builder().getOrCreate()
-    import spark.implicits._
-   println
-					println
-					println
-					println
-					println
+   
+					
 					println("======================= Step 2 ========Raw data=============================================")
-					println
-					println
-					println
-					println
-					println
-
+					
 
 
 					val data = spark.read.format("com.databricks.spark.avro")
@@ -52,18 +51,9 @@ object obj {
 
 
 
-					println
-					println
-					println
-					println
-					println
+					
 					println("======================== Step 3 ========Url data=============================================")
-					println
-					println
-					println
-					println
-					println
-
+					
 
 					val html = Source.fromURL("https://randomuser.me/api/0.8/?results=500")
 					val s = html.mkString
@@ -76,18 +66,9 @@ object obj {
 
 
 
-					println
-					println
-					println
-					println
-					println
+					
 					println("========================step 4 flatten dataframe=============================================")
-					println
-					println
-					println
-					println
-					println
-
+					
 					val flatdf = urldf.withColumn("results",explode(col("results"))).select("nationality","seed","version",
 							"results.user.username","results.user.cell","results.user.dob","results.user.email",
 							"results.user.gender","results.user.location.city","results.user.location.state",
@@ -103,18 +84,9 @@ object obj {
 
 
 
-					println
-					println
-					println
-					println
-					println
+					
 					println("========================step 5 removed numericals Dataframe=============================================")
-					println
-					println
-					println
-					println
-					println
-
+					
 					val rm=flatdf.withColumn("username",regexp_replace(col("username"),  "([0-9])", ""))
 					rm.show()
 
@@ -124,34 +96,18 @@ object obj {
 
 
 
-					println
-					println
-					println
-					println
-					println
+					
 					println("====================== Step 6 =========Joined Dataframe=============================================")
-					println
-					println
-					println
-					println
-					println
+					
 					val joindf = data.join(broadcast(rm),Seq("username"),"left")
 
 
 					joindf.show()
 
 
-					println
-					println
-					println
-					println
+					
 					println("=================== Step 7 a ============Not available customers=============================================")
-					println
-					println
-					println
-					println
-					println
-					println
+					
 
 
 					val dfnull = joindf.filter(col("nationality").isNull)
@@ -166,17 +122,9 @@ object obj {
 					
 
 
-					println
-					println
-					println
-					println
+					
 					println("==================  Step 7 b =============available customers=============================================")
-					println
-					println
-					println
-					println
-					println
-					println
+					
 
 
 
@@ -187,35 +135,18 @@ object obj {
 
 
 
-					println
-					println
-					println
-					println
+					
 					println("=============== Step 8 ================Null handled dataframe=============================================")
-					println
-					println
-					println
-					println
-					println
-					println
-
+					
 
 
 					val replacenull= dfnull.na.fill("Not Available").na.fill(0)
 					replacenull.show()
 
 
-					println
-					println
-					println
-					println
+					
 					println("=============== Step 9 a ================not available customers with current date dataframe=============================================")
-					println
-					println
-					println
-					println
-					println
-					println
+					
 
 
 
@@ -223,23 +154,9 @@ object obj {
 
 					replacenull_with_current_date.show()
 
-					println
-					println
-					println
-
-
-
-					println
-					println
-					println
-					println
+				
 					println("=============== Step 9 b ================available customers with current date dataframe=============================================")
-					println
-					println
-					println
-					println
-					println
-					println
+					
 
 
 
