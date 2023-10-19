@@ -47,6 +47,12 @@ object obj {
 					.load("file:///M://data//projectsample.avro")
 
 					data.show()
+					val html = Source.fromURL("https://randomuser.me/api/0.8/?results=500")
+					val s = html.mkString
+					//println(s)
+
+					val urldf = spark.read.json(sc.parallelize(List(s)))
+					urldf.show()
 
 
 
